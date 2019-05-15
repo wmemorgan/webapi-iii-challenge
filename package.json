@@ -4,6 +4,7 @@
   "description": "Web API Blog Project",
   "main": "index.js",
   "scripts": {
+    "start": "yarn server",
     "server": "nodemon index.js"
   },
   "repository": {
