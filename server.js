@@ -1,13 +1,17 @@
-const express = 'express';
+const express = require('express')
 
-const server = express();
+const server = express()
+server.use(express.json())
 
-server.get('/', (req, res) => {
-  res.send(`<h2>Let's write some middleware!</h2>`)
-});
+server.use(`/`, (req, res) => {
+  let nameInsert = ''
+  res.send(`
+    <h2>Node Blog API</h2>
+    <p>Welcome${nameInsert} to my Node Blog API</p>
+  `);
+})
 
-//custom middleware
-
+// Custom Middleware
 function logger(req, res, next) {
 
 };
