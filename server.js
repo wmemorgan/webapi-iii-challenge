@@ -1,7 +1,10 @@
 const express = require('express')
 
 const server = express()
+
+// Invoke middleware
 server.use(express.json())
+server.use(logger)
 
 server.use(`/`, (req, res) => {
   let nameInsert = ''
@@ -13,7 +16,16 @@ server.use(`/`, (req, res) => {
 
 // Custom Middleware
 function logger(req, res, next) {
+  const { method, url } = req
+  // Capture request information
+  let requestLog = {
+    type: method,
+    url,
+    timestamp: Date.now()
+  }
 
+  console.log(`Request log: ${JSON.stringify(requestLog)}`)
+  next()
 };
 
 module.exports = server;
