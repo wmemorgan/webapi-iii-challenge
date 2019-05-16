@@ -1,5 +1,6 @@
 const express = require('express')
 const db = require('./userDb')
+const Posts = require('../posts/postDb')
 const router = express.Router()
 
 const idContentSubmissionCheck = [validateUserId, validatePost]
@@ -14,9 +15,15 @@ router.post('/', validateUser, async (req, res) => {
   }
 });
 
-// router.post('/:id/posts', idContentSubmissionCheck, (req, res) => {
-
-// });
+router.post('/:id/posts', idContentSubmissionCheck, async (req, res) => {
+  try {
+    const user = await Posts.insert(req.body)
+    res.send(user)
+  }
+  catch (err) {
+    res.status(500).json({ message: `Error in adding a post` })
+  }
+})
 
 router.get('/', async (req, res) => {
   try {
