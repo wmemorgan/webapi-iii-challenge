@@ -1,6 +1,6 @@
 const express = require('express')
 const db = require('./userDb')
-const router = express.Router();
+const router = express.Router()
 
 const idContentSubmissionCheck = [validateUserId, validatePost]
 
@@ -14,9 +14,9 @@ router.post('/', validateUser, async (req, res) => {
   }
 });
 
-router.post('/:id/posts', idContentSubmissionCheck, (req, res) => {
+// router.post('/:id/posts', idContentSubmissionCheck, (req, res) => {
 
-});
+// });
 
 router.get('/', async (req, res) => {
   try {
@@ -24,26 +24,48 @@ router.get('/', async (req, res) => {
     res.send(data)
   }
   catch (err) {
-    console.log(`500 error message: `, err)
     res.status(500).json({ message: err })
   }
-});
+})
 
 router.get('/:id', validateUserId, (req, res) => {
   res.send(req.user)
-});
+})
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, async (req, res) => {
+  try {
+    const userPosts = await db.getUserPosts(req.user.id)
+    res.send(userPosts)
+  }
+  catch (err) {
+    res.status(500).json({ message: `Error retrieving user posts`})
+  }
+})
 
-});
+router.delete('/:id', validateUserId, async (req, res) => {
+  try {
+    const deleteCount = await db.remove(req.user.id)
+    if (deleteCount > 0) {
+      res.json({ message: `User ${req.user.id} deleted` })
+    } else throw err
+  }
+  catch (err) {
+    res.status(500).json({ message: `Error deleting user` })
+  }
+})
 
-router.delete('/:id', (req, res) => {
-
-});
-
-router.put('/:id', (req, res) => {
-
-});
+router.put('/:id', idContentSubmissionCheck, async (req, res) => {
+  try {
+    const updateCount = await db.update(req.user.id, req.body)
+    if (updateCount > 0) {
+      const updatedUser = await db.getById(req.user.id)
+      res.json(updatedUser)
+    } else throw err
+  }
+  catch (err) {
+    res.status(500).json({ message: `Error updating user` })
+  }
+})
 
 // Custom Middleware
 async function validateUserId(req, res, next) {
@@ -57,12 +79,10 @@ async function validateUserId(req, res, next) {
       res.status(404).json({ message: `invalid user id` })
     }
   }
-
   catch (err) {
     res.status(500).json({ message: `Failed to process request` })
   }
-
-};
+}
 
 function validateUser(req, res, next) {
   // Validate non-empty body
@@ -73,8 +93,7 @@ function validateUser(req, res, next) {
   } else { // Proceed with executing the rest of the route
     next()
   }
-
-};
+}
 
 function validatePost(req, res, next) {
   // Validate non-empty body
@@ -85,6 +104,6 @@ function validatePost(req, res, next) {
   } else { // Proceed with executing the rest of the route
     next()
   }
-};
+}
 
 module.exports = router;
