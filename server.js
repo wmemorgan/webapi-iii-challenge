@@ -1,11 +1,12 @@
 const express = require('express')
-
+const userRoutes = require('./users/userRouter')
 const server = express()
 
-// Invoke middleware
+// Global middleware
 server.use(express.json())
 server.use(logger)
 
+server.use(`/api/users`, userRoutes)
 server.use(`/`, (req, res) => {
   let nameInsert = ''
   res.send(`
@@ -17,14 +18,7 @@ server.use(`/`, (req, res) => {
 // Custom Middleware
 function logger(req, res, next) {
   const { method, url } = req
-  // Capture request information
-  let requestLog = {
-    type: method,
-    url,
-    timestamp: Date.now()
-  }
-
-  console.log(`Request log: ${JSON.stringify(requestLog)}`)
+  console.log(`${method} ${url} ${Date.now()}`)
   next()
 };
 
